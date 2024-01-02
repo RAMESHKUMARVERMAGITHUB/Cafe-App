@@ -15,14 +15,14 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/RAMESHKUMARVERMAGITHUB/Jenkins-Sonarqube-Docker.git'
+                git branch: 'main', url: 'https://github.com/RAMESHKUMARVERMAGITHUB/Cafe-App.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=website \
-                    -Dsonar.projectKey=website'''
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=cafe-app \
+                    -Dsonar.projectKey=cafe-app'''
                 }
             }
         }
@@ -53,21 +53,21 @@ pipeline{
             steps{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh "docker build -t rameshkumarverma/website:latest ."
+                       sh "docker build -t rameshkumarverma/cafe-app:latest ."
                        // sh "docker tag uber rameshkumarverma/uber:latest "
-                       sh "docker push rameshkumarverma/website:latest"
+                       sh "docker push rameshkumarverma/cafe-app:latest"
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image rameshkumarverma/website:latest > trivyimage.txt"
+                sh "trivy image rameshkumarverma/cafe-app:latest > trivyimage.txt"
             }
         }
         stage("deploy_docker"){
             steps{
-                sh "docker run -d --name website -p 8085:80 rameshkumarverma/website:latest"
+                sh "docker run -d --name website -p 8085:80 rameshkumarverma/cafe-app:latest"
             }
         }
         // stage('Deploy to kubernets'){
